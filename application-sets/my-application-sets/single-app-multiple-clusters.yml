@@ -1,10 +1,12 @@
+
+
 apiVersion: argoproj.io/v1alpha1
 
 kind: ApplicationSet
 
 metadata:
 
-  name: many-apps-application-set
+  name: multi-cluster-application-set
 
   namespace: argocd
 
@@ -12,21 +14,13 @@ spec:
 
   generators:
 
-  - git:
-
-      repoURL: https://github.com/codefresh-contrib/gitops-cert-level-2-examples.git
-
-      revision: HEAD
-
-      directories:
-
-      - path: application-sets/example-apps/*
+  - clusters: {} # Automatically use all clusters defined within Argo CD
 
   template:      
 
     metadata:
 
-      name: '{{path.basename}}'
+      name: '{{name}}-billing-app'
 
     spec:
 
@@ -42,7 +36,7 @@ spec:
 
         targetRevision: HEAD
 
-        path: '{{path}}'
+        path: ./application-sets/manifests
 
       
 
@@ -50,9 +44,9 @@ spec:
 
       destination:
 
-        server: https://kubernetes.default.svc
+        server: '{{server}}'
 
-        namespace: '{{path.basename}}'
+        namespace: billing
 
       # Sync policy
 
